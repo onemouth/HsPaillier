@@ -15,6 +15,7 @@ Icon
 .Trashes
 
 ### Haskell ###
+cabal.sandbox.config
 dist
 cabal-dev
 .cabal-sandbox
