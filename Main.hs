@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 
 import System.Console.CmdArgs
+import Crypto.Random
 
 data Sample = Sample {hello :: String}
     deriving (Show, Data, Typeable)
