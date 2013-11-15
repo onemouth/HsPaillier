@@ -1,15 +1,13 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 
 import System.Console.CmdArgs
-import Crypto.Random
 
-data Sample = Sample {hello :: String}
+data Sample = Sample {encrypt :: Integer}
     deriving (Show, Data, Typeable)
 
-sample = Sample{hello = def}
-sample2 = Sample {hello = def &= help "Who to say hello to" &= typ "WORLD"}
+sample = Sample {encrypt = def &= help "which integer to encrypt" &= typ "0"}
 
 
 main = do
-    print =<< cmdArgs sample2
+    print =<< cmdArgs sample
     
