@@ -5,9 +5,9 @@ import Crypto.Random
 import Crypto.Number.Prime
 import Crypto.Number.ModArithmetic
 
-newtype PlainText = PlainText Integer
+newtype PlainText = PlainText Integer deriving Show
 
-newtype CipherText = CipherText Integer
+newtype CipherText = CipherText Integer deriving Show
 
 data PubKey = PubKey{  bits :: Int  -- ^ e.g., 2048
                      , n :: Integer -- ^ n = pq
