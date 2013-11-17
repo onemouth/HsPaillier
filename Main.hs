@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 
 import System.Console.CmdArgs
+import Paillier
 
 data Sample = Sample {encrypt :: Integer}
     deriving (Show, Data, Typeable)
