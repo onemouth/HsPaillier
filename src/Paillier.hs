@@ -40,4 +40,12 @@ genKey nBits = do
     else
         return (PubKey{bits=nBits, n=modulo, g=g, n_square=square}
            ,PrvKey{lambda=phi_n, x=(fromJust maybeU)})
-        
+
+encrypt :: PubKey -> PlainText -> IO CipherText
+encrypt pubKey plaintext = 
+    return $ CipherText 1
+
+decrypt :: PrvKey -> CipherText -> PlainText
+decrypt prvKey ciphertext = 
+    PlainText 1
+
