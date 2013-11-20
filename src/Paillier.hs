@@ -3,11 +3,12 @@ module Paillier where
 import Data.Maybe
 import Crypto.Random
 import Crypto.Number.Prime
+import Crypto.Number.Generate (generateOfSize)
 import Crypto.Number.ModArithmetic
 
-newtype PlainText = PlainText Integer deriving Show
+type PlainText = Integer 
 
-newtype CipherText = CipherText Integer deriving Show
+type CipherText = Integer
 
 data PubKey = PubKey{  bits :: Int  -- ^ e.g., 2048
                      , n :: Integer -- ^ n = pq
@@ -34,18 +35,40 @@ genKey nBits = do
     let square = modulo*modulo
     -- | private key parameters
     let phi_n = (p-1)*(q-1)
-    let maybeU = inverse (((expSafe g phi_n square) - 1) `div` modulo) modulo
+    --let maybeU = inverse (((expSafe g phi_n square) - 1) `div` modulo) modulo
+    let maybeU = inverse phi_n modulo
     if isNothing maybeU then
        error "genKey failed." 
     else
         return (PubKey{bits=nBits, n=modulo, g=g, n_square=square}
            ,PrvKey{lambda=phi_n, x=(fromJust maybeU)})
 
+-- | deterministic version of encryption
+_encrypt :: PubKey -> PlainText -> Integer -> CipherText
+_encrypt pubKey plaintext r = 
+    result
+    where result = (g_m*r_n) `mod` n_2
+          n_2 = n_square pubKey
+          g_m = expSafe (g pubKey) plaintext n_2
+          r_n = expSafe r (n pubKey) n_2
+
+gereateR :: SystemRNG -> PubKey -> Integer -> Integer
+gereateR rng pubKey guess =
+    if guess >= (n pubKey) || (gcd (n pubKey) guess > 1) then
+        gereateR nextRng pubKey nextGuess
+    else
+        guess
+
+        where (nextGuess, nextRng) = generateOfSize rng (bits pubKey)
+
 encrypt :: PubKey -> PlainText -> IO CipherText
-encrypt pubKey plaintext = 
-    return $ CipherText 1
+encrypt pubKey plaintext = do
+    pool <- createEntropyPool
+    let rng = cprgCreate pool :: SystemRNG
+    let r = gereateR rng pubKey (n pubKey)
+    return $ _encrypt pubKey plaintext r 
 
 decrypt :: PrvKey -> CipherText -> PlainText
 decrypt prvKey ciphertext = 
-    PlainText 1
+    1
 
