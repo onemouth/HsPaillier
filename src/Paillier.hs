@@ -68,7 +68,9 @@ encrypt pubKey plaintext = do
     let r = gereateR rng pubKey (n pubKey)
     return $ _encrypt pubKey plaintext r 
 
-decrypt :: PrvKey -> CipherText -> PlainText
-decrypt prvKey ciphertext = 
-    1
+decrypt :: PrvKey -> PubKey -> CipherText -> PlainText
+decrypt prvKey pubKey ciphertext = 
+    let c_lambda = expSafe ciphertext (lambda prvKey) (n_square pubKey)
+        l_c_lamdba = (c_lambda - 1) `div` (n pubKey)
+    in  (l_c_lamdba) * (x prvKey) `mod` (n pubKey)
 
