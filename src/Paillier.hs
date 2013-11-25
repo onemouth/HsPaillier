@@ -7,7 +7,7 @@ import Crypto.Number.Prime
 import Crypto.Number.Generate (generateOfSize)
 import Crypto.Number.ModArithmetic
 
-#if 1
+#if 0
 import System.IO
 #endif
 
@@ -17,7 +17,7 @@ type CipherText = Integer
 
 data PubKey = PubKey{  bits :: Int  -- ^ e.g., 2048
                      , n_modulo :: Integer -- ^ n = pq
-                     , g :: Integer -- ^ g = n+1
+                     , generator :: Integer -- ^ generator = n+1
                      , n_square :: Integer -- ^ n^2
                     } deriving (Show)
 
@@ -46,7 +46,7 @@ genKey nBits = do
     if isNothing maybeU then
        error "genKey failed." 
     else
-        return (PubKey{bits=nBits, n_modulo=modulo, g=g, n_square=square}
+        return (PubKey{bits=nBits, n_modulo=modulo, generator=g, n_square=square}
            ,PrvKey{lambda=phi_n, x=(fromJust maybeU)})
 
 -- | deterministic version of encryption
@@ -55,29 +55,28 @@ _encrypt pubKey plaintext r =
     result
     where result = (g_m*r_n) `mod` n_2
           n_2 = n_square pubKey
-          g_m = expSafe (g pubKey) plaintext n_2
+          g_m = expSafe (generator pubKey) plaintext n_2
           r_n = expSafe r (n_modulo pubKey) n_2
 
-gereateR :: SystemRNG -> PubKey -> Integer -> Integer
-gereateR rng pubKey guess =
-    if guess > (n_modulo pubKey) || (gcd (n_modulo pubKey) guess > 1) then
-    --if guess > (n_modulo pubKey) || guess <= 0  then
-        gereateR nextRng pubKey nextGuess
+generateR :: SystemRNG -> PubKey -> Integer -> Integer
+generateR rng pubKey guess =
+    if guess > (n_modulo pubKey) || ((gcd (n_modulo pubKey) guess) > 1) then
+        generateR nextRng pubKey nextGuess
     else
         guess
 
-    where (nextGuess, nextRng) = generateOfSize rng (bits pubKey)
+    where (nextGuess, nextRng) = generateOfSize rng ((bits pubKey) -1)
 
 encrypt :: PubKey -> PlainText -> IO CipherText
 encrypt pubKey plaintext = do
     pool <- createEntropyPool
     let rng = cprgCreate pool :: SystemRNG
-#if 1
+#if 0
     hSetBuffering stdout NoBuffering
     putStrLn "get r..."
 #endif
-    let r = gereateR rng pubKey (n_modulo pubKey)
-#if 1
+    let r = generateR rng pubKey (n_modulo pubKey)
+#if 0
     putStrLn $ "r=" ++ (show r)
 #endif
     return $ _encrypt pubKey plaintext r 
