@@ -4,7 +4,7 @@ module Paillier where
 import Data.Maybe
 import Crypto.Random
 import Crypto.Number.Prime
-import Crypto.Number.Generate (generateOfSize)
+import Crypto.Number.Generate (generateOfSize, generateBetween)
 import Crypto.Number.ModArithmetic
 
 #if 0
@@ -60,12 +60,12 @@ _encrypt pubKey plaintext r =
 
 generateR :: SystemRNG -> PubKey -> Integer -> Integer
 generateR rng pubKey guess =
-    if guess > (n_modulo pubKey) || ((gcd (n_modulo pubKey) guess) > 1) then
+    if guess >= (n_modulo pubKey) || ((gcd (n_modulo pubKey) guess) > 1) then
         generateR nextRng pubKey nextGuess
     else
         guess
 
-    where (nextGuess, nextRng) = generateOfSize rng ((bits pubKey) -1)
+    where (nextGuess, nextRng) = generateBetween rng 1 ((n_modulo pubKey) -1)
 
 encrypt :: PubKey -> PlainText -> IO CipherText
 encrypt pubKey plaintext = do
