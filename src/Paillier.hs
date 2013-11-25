@@ -35,6 +35,7 @@ genKey nBits = do
     let square = modulo*modulo
     -- | private key parameters
     let phi_n = (p-1)*(q-1)
+    --let phi_n = lcm (p-1) (q-1)
     --let maybeU = inverse (((expSafe g phi_n square) - 1) `div` modulo) modulo
     let maybeU = inverse phi_n modulo
     if isNothing maybeU then
@@ -49,8 +50,8 @@ _encrypt pubKey plaintext r =
     result
     where result = (g_m*r_n) `mod` n_2
           n_2 = n_square pubKey
-          g_m = expFast (g pubKey) plaintext n_2
-          r_n = expFast r (n pubKey) n_2
+          g_m = expSafe (g pubKey) plaintext n_2
+          r_n = expSafe r (n pubKey) n_2
 
 gereateR :: SystemRNG -> PubKey -> Integer -> Integer
 gereateR rng pubKey guess =
