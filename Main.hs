@@ -11,5 +11,11 @@ sample = Sample {encrypt = def &= help "which integer to encrypt" &= typ "0"}
 
 
 main = do
-    print =<< cmdArgs sample
+    --print =<< cmdArgs sample
+    (pubKey, prvKey) <- P.genKey 128
+    print (pubKey, prvKey)
+    let p = 1034 :: Integer
+    c <- P.encrypt pubKey p
+    putStrLn $ "ciphertext: " ++ show c
+    putStrLn $ "plaintext: " ++ show (P.decrypt prvKey pubKey c)
     

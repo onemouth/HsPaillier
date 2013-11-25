@@ -49,8 +49,8 @@ _encrypt pubKey plaintext r =
     result
     where result = (g_m*r_n) `mod` n_2
           n_2 = n_square pubKey
-          g_m = expSafe (g pubKey) plaintext n_2
-          r_n = expSafe r (n pubKey) n_2
+          g_m = expFast (g pubKey) plaintext n_2
+          r_n = expFast r (n pubKey) n_2
 
 gereateR :: SystemRNG -> PubKey -> Integer -> Integer
 gereateR rng pubKey guess =
@@ -65,7 +65,9 @@ encrypt :: PubKey -> PlainText -> IO CipherText
 encrypt pubKey plaintext = do
     pool <- createEntropyPool
     let rng = cprgCreate pool :: SystemRNG
+    --putStrLn "get r..."
     let r = gereateR rng pubKey (n pubKey)
+    --putStrLn "get r...done"
     return $ _encrypt pubKey plaintext r 
 
 decrypt :: PrvKey -> PubKey -> CipherText -> PlainText
