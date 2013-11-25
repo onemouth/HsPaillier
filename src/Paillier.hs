@@ -87,3 +87,14 @@ decrypt prvKey pubKey ciphertext =
         l_c_lamdba = (c_lambda - 1) `div` (n_modulo pubKey)
     in  (l_c_lamdba) * (x prvKey) `mod` (n_modulo pubKey)
 
+-- | ciphetext muliplication is known as homomorphic addition of plaintexts
+cipherMul :: PubKey -> CipherText -> CipherText -> CipherText
+cipherMul pubKey c1 c2 = (c1*c2) `mod` (n_square pubKey)
+
+-- | Homomorphic multiplication of plaintexts
+-- An encrypted plaintext raised to the power of another plaintext will decrypt to the product of the two plaintexts.
+cipherExp :: PubKey -> CipherText -> PlainText -> CipherText
+cipherExp pubKey c1 p1 = expSafe c1 p1 (n_square pubKey)
+
+
+
