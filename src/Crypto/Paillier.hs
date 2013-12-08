@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP #-}
-module Paillier where
+module Crypto.Paillier where
 
 import Data.Maybe
 import Crypto.Random

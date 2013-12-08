@@ -6,7 +6,7 @@ import Test.Framework
 import Test.Framework.TH
 import Test.Framework.Providers.QuickCheck2
 
-import Paillier
+import Crypto.Paillier
 
 
 instance Show (IO (PubKey, PrvKey))

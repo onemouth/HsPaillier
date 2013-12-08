@@ -2,7 +2,7 @@
 
 module Main where
 import System.Console.CmdArgs
-import qualified Paillier as P
+import qualified Crypto.Paillier as P
 
 data Sample = Sample {encrypt :: Integer}
     deriving (Show, Data, Typeable)
