@@ -22,10 +22,10 @@ library
  default-language: Haskell2010
  build-depends: base >=4.6 && <4.7, crypto-numbers >= 0.2.2, crypto-random >= 0.0.7
 
-executable paillier
-  main-is: Main.hs            
-  build-depends:       base >=4.6 && <4.7, cmdargs >= 0.10.5, Paillier >= 0.1.0.0
-  default-language:    Haskell2010
+--executable paillier
+--  main-is: Main.hs            
+--  build-depends:       base >=4.6 && <4.7, cmdargs >= 0.10.5, Paillier >= 0.1.0.0
+--  default-language:    Haskell2010
 
 Test-suite test-Paillier
   type: exitcode-stdio-1.0
