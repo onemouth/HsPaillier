@@ -29,20 +29,20 @@ data PrvKey = PrvKey{  lambda :: Integer -- ^ lambda(n) = lcm(p-1, q-1)
 
 genKey :: Int -> IO (PubKey, PrvKey)
 genKey nBits = do
-    -- | choose random primes
+    -- choose random primes
     pool <- createEntropyPool
     let rng = cprgCreate pool :: SystemRNG
     let (p, rng1) = generatePrime rng (nBits `div` 2)
     let (q, rng2) = generatePrime rng1 (nBits `div` 2)
-    -- | public key parameters
+    -- public key parameters
     let modulo = p*q
     let g = modulo+1
     let square = modulo*modulo
-    -- | private key parameters
-    --let phi_n = (p-1)*(q-1)
+    -- private key parameters
+    -- let phi_n = (p-1)*(q-1)
     let phi_n = lcm (p-1) (q-1)
     let maybeU = inverse (((expSafe g phi_n square) - 1) `div` modulo) modulo
-    --let maybeU = inverse phi_n modulo
+    -- let maybeU = inverse phi_n modulo
     if isNothing maybeU then
        error "genKey failed." 
     else
