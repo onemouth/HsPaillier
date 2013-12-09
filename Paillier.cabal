@@ -1,6 +1,6 @@
 
 name:                Paillier
-version:             0.1.0.1
+version:             0.1.0.2
 synopsis:            a simple Paillier cryptosystem    
 description:         a simple Paillier cryptosystem        
 license:             BSD3
@@ -14,7 +14,7 @@ cabal-version:       >=1.10
 source-repository this
  type:     git
  location: https://github.com/onemouth/HsPaillier.git
- tag: 0.1.0.1
+ tag: 0.1.0.2
 
 library
  hs-source-dirs: src
