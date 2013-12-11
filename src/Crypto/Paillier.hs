@@ -16,9 +16,9 @@ type PlainText = Integer
 type CipherText = Integer
 
 data PubKey = PubKey{  bits :: Int  -- ^ e.g., 2048
-                     , n_modulo :: Integer -- ^ n = pq
+                     , nModulo :: Integer -- ^ n = pq
                      , generator :: Integer -- ^ generator = n+1
-                     , n_square :: Integer -- ^ n^2
+                     , nSquare :: Integer -- ^ n^2
                     } deriving (Show)
 
 data PrvKey = PrvKey{  lambda :: Integer -- ^ lambda(n) = lcm(p-1, q-1)
@@ -46,7 +46,7 @@ genKey nBits = do
     if isNothing maybeU then
        error "genKey failed." 
     else
-        return (PubKey{bits=nBits, n_modulo=modulo, generator=g, n_square=square}
+        return (PubKey{bits=nBits, nModulo=modulo, generator=g, nSquare=square}
            ,PrvKey{lambda=phi_n, x=fromJust maybeU})
 
 -- | deterministic version of encryption
@@ -54,18 +54,18 @@ _encrypt :: PubKey -> PlainText -> Integer -> CipherText
 _encrypt pubKey plaintext r = 
     result
     where result = (g_m*r_n) `mod` n_2
-          n_2 = n_square pubKey
+          n_2 = nSquare pubKey
           g_m = expSafe (generator pubKey) plaintext n_2
-          r_n = expSafe r (n_modulo pubKey) n_2
+          r_n = expSafe r (nModulo pubKey) n_2
 
 generateR :: SystemRNG -> PubKey -> Integer -> Integer
 generateR rng pubKey guess =
-    if guess >= n_modulo pubKey || (gcd (n_modulo pubKey) guess > 1) then
+    if guess >= nModulo pubKey || (gcd (nModulo pubKey) guess > 1) then
         generateR nextRng pubKey nextGuess
     else
         guess
 
-    where (nextGuess, nextRng) = generateBetween rng 1 (n_modulo pubKey -1)
+    where (nextGuess, nextRng) = generateBetween rng 1 (nModulo pubKey -1)
 
 encrypt :: PubKey -> PlainText -> IO CipherText
 encrypt pubKey plaintext = do
@@ -75,7 +75,7 @@ encrypt pubKey plaintext = do
     hSetBuffering stdout NoBuffering
     putStrLn "get r..."
 #endif
-    let r = generateR rng pubKey (n_modulo pubKey)
+    let r = generateR rng pubKey (nModulo pubKey)
 #if 0
     putStrLn $ "r=" ++ (show r)
 #endif
@@ -83,18 +83,18 @@ encrypt pubKey plaintext = do
 
 decrypt :: PrvKey -> PubKey -> CipherText -> PlainText
 decrypt prvKey pubKey ciphertext = 
-    let c_lambda = expSafe ciphertext (lambda prvKey) (n_square pubKey)
-        l_c_lamdba = (c_lambda - 1) `div` (n_modulo pubKey)
-    in  (l_c_lamdba) * (x prvKey) `mod` (n_modulo pubKey)
+    let c_lambda = expSafe ciphertext (lambda prvKey) (nSquare pubKey)
+        l_c_lamdba = (c_lambda - 1) `div` nModulo pubKey
+    in  l_c_lamdba * x prvKey `mod` nModulo pubKey
 
 -- | ciphetext muliplication is known as homomorphic addition of plaintexts
 cipherMul :: PubKey -> CipherText -> CipherText -> CipherText
-cipherMul pubKey c1 c2 = (c1*c2) `mod` (n_square pubKey)
+cipherMul pubKey c1 c2 = c1*c2 `mod` nSquare pubKey
 
 -- | Homomorphic multiplication of plaintexts
 -- An encrypted plaintext raised to the power of another plaintext will decrypt to the product of the two plaintexts.
 cipherExp :: PubKey -> CipherText -> PlainText -> CipherText
-cipherExp pubKey c1 p1 = expSafe c1 p1 (n_square pubKey)
+cipherExp pubKey c1 p1 = expSafe c1 p1 (nSquare pubKey)
 
 
 
