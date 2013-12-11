@@ -4,7 +4,7 @@ module Crypto.Paillier where
 import Data.Maybe
 import Crypto.Random
 import Crypto.Number.Prime
-import Crypto.Number.Generate (generateOfSize, generateBetween)
+import Crypto.Number.Generate (generateBetween)
 import Crypto.Number.ModArithmetic
 
 #if 0
@@ -33,7 +33,7 @@ genKey nBits = do
     pool <- createEntropyPool
     let rng = cprgCreate pool :: SystemRNG
     let (p, rng1) = generatePrime rng (nBits `div` 2)
-    let (q, rng2) = generatePrime rng1 (nBits `div` 2)
+    let (q, _) = generatePrime rng1 (nBits `div` 2)
     -- public key parameters
     let modulo = p*q
     let g = modulo+1
@@ -41,13 +41,13 @@ genKey nBits = do
     -- private key parameters
     -- let phi_n = (p-1)*(q-1)
     let phi_n = lcm (p-1) (q-1)
-    let maybeU = inverse (((expSafe g phi_n square) - 1) `div` modulo) modulo
+    let maybeU = inverse ((expSafe g phi_n square - 1) `div` modulo) modulo
     -- let maybeU = inverse phi_n modulo
     if isNothing maybeU then
        error "genKey failed." 
     else
         return (PubKey{bits=nBits, n_modulo=modulo, generator=g, n_square=square}
-           ,PrvKey{lambda=phi_n, x=(fromJust maybeU)})
+           ,PrvKey{lambda=phi_n, x=fromJust maybeU})
 
 -- | deterministic version of encryption
 _encrypt :: PubKey -> PlainText -> Integer -> CipherText
@@ -60,12 +60,12 @@ _encrypt pubKey plaintext r =
 
 generateR :: SystemRNG -> PubKey -> Integer -> Integer
 generateR rng pubKey guess =
-    if guess >= (n_modulo pubKey) || ((gcd (n_modulo pubKey) guess) > 1) then
+    if guess >= n_modulo pubKey || (gcd (n_modulo pubKey) guess > 1) then
         generateR nextRng pubKey nextGuess
     else
         guess
 
-    where (nextGuess, nextRng) = generateBetween rng 1 ((n_modulo pubKey) -1)
+    where (nextGuess, nextRng) = generateBetween rng 1 (n_modulo pubKey -1)
 
 encrypt :: PubKey -> PlainText -> IO CipherText
 encrypt pubKey plaintext = do
