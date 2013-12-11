@@ -23,7 +23,7 @@ For example,
     let c'' = P.cipherMul pubKey c c'
     putStrLn $ "plaintext: " ++ show (P.decrypt prvKey pubKey c'')
     
-The result will be 102 which is 2+102 (We just decrypt once!)
+The result will be 102 which is 2+100 (We just decrypt once!)
 
 The above example is in the `Main.hs`
 
