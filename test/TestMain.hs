@@ -1,5 +1,7 @@
 {-# LANGUAGE TemplateHaskell, FlexibleInstances #-}
 
+import System.IO.Unsafe (unsafePerformIO)
+
 import Test.QuickCheck
 import Test.QuickCheck.Monadic
 import Test.Framework
@@ -9,7 +11,8 @@ import Test.Framework.Providers.QuickCheck2
 import Crypto.Paillier
 
 
-instance Show (IO (PubKey, PrvKey))
+instance Show (IO (PubKey, PrvKey)) where
+    show a = show (unsafePerformIO a)
 
 instance Arbitrary (IO (PubKey, PrvKey)) where
     arbitrary = do
