@@ -96,5 +96,9 @@ cipherMul pubKey c1 c2 = c1*c2 `mod` nSquare pubKey
 cipherExp :: PubKey -> CipherText -> PlainText -> CipherText
 cipherExp pubKey c1 p1 = expSafe c1 p1 (nSquare pubKey)
 
-
+-- | Homomorphic subtraction => c1 - c2, given two ciphertexts c1 and c2
+homoSub :: PubKey -> CipherText -> CipherText -> CipherText
+homoSub pubKey c1 c2 = cipherMul pubKey c1 minusc2
+  where
+    minusc2 = cipherExp pubKey c2 (-1)
 
