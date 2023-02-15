@@ -1,5 +1,7 @@
 # Created by http://gitignore.io
 
+cabal.project.local~
+
 ### OSX ###
 .DS_Store
 .AppleDouble
@@ -24,3 +26,4 @@ cabal-dev
 *.chi
 *.chs.h
 .virthualenv
+dist-newstyle/

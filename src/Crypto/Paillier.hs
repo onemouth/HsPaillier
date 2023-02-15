@@ -11,6 +11,8 @@ import Crypto.Number.ModArithmetic
 import System.IO
 #endif
 
+
+
 type PlainText = Integer 
 
 type CipherText = Integer
@@ -19,6 +21,7 @@ data PubKey = PubKey{  bits :: Int  -- ^ e.g., 2048
                      , nModulo :: Integer -- ^ n = pq
                      , generator :: Integer -- ^ generator = n+1
                      , nSquare :: Integer -- ^ n^2
+                     , maxInt  :: Integer -- ^ n/3
                     } deriving (Show)
 
 data PrvKey = PrvKey{  lambda :: Integer -- ^ lambda(n) = lcm(p-1, q-1)
@@ -46,7 +49,7 @@ genKey nBits = do
     if isNothing maybeU then
        error "genKey failed." 
     else
-        return (PubKey{bits=nBits, nModulo=modulo, generator=g, nSquare=square}
+        return (PubKey{bits=nBits, nModulo=modulo, generator=g, nSquare=square, maxInt = (modulo `div` 3)}
            ,PrvKey{lambda=phi_n, x=fromJust maybeU})
 
 -- | deterministic version of encryption
@@ -96,5 +99,8 @@ cipherMul pubKey c1 c2 = c1*c2 `mod` nSquare pubKey
 cipherExp :: PubKey -> CipherText -> PlainText -> CipherText
 cipherExp pubKey c1 p1 = expSafe c1 p1 (nSquare pubKey)
 
-
-
+-- | Homomorphic subtraction => c1 - c2, given two ciphertexts c1 and c2
+homoSub :: PubKey -> CipherText -> CipherText -> CipherText
+homoSub pubKey c1 c2 = cipherMul pubKey c1 minusc2
+  where
+    minusc2 = cipherExp pubKey c2 (-1)
